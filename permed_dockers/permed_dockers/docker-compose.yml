@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  anaconda:
+    container_name: python-docker
+    build:
+      context: .
+      dockerfile: python_dockerfile  
+    volumes:
+       - /home/permed:/home/permed
+    ports:
+      - "8888:8888"
+    command:
+      /opt/conda/bin/jupyter notebook --notebook-dir=/home/permed/python --ip='0.0.0.0' --port=8888 --no-browser --allow-root
+
+  db:
+    container_name: mysql-docker
+    image: mysql:8.0.28
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+    volumes:
+      - /home/permed/mysql:/var/lib/mysql     
+    ports:
+      - "3306:3306"
+    command: --federated
+  
+  web:
+    container_name: php-docker
+    build:
+      context: .
+      dockerfile: php_dockerfile  
+    depends_on:
+      - db
+    volumes:
+      - /home/permed/php:/var/www/html
+      - /home/permed/permed_dockers/apache2/sites-enabled:/etc/apache2/sites-enabled
+    ports:
+      - "80:80"
+      
+  composer:
+    container_name: composer-docker
+    image: composer:latest
+    volumes:
+      - /home/permed/php:/app
+
