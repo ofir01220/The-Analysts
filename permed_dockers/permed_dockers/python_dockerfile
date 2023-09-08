@@ -1,7 +1,0 @@
-FROM continuumio/anaconda3
-
-ADD python_requirements.txt /
-
-RUN pip install -r python_requirements.txt
-
-EXPOSE 8888
